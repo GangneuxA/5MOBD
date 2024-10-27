@@ -1,14 +1,15 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TextInput, Button } from 'react-native';
 import { getAuth, updateEmail, updatePassword, signOut } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
 import { db, storage } from '../config/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
+import { UserContext } from '../context/UserContext';
 
 export default function UserProfile({ navigation }) {
+  const { user, setUser } = useContext(UserContext);
   const auth = getAuth();
-  const user = auth.currentUser;
 
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
@@ -56,6 +57,7 @@ export default function UserProfile({ navigation }) {
   const handleSignOut = async () => {
     try {
       await signOut(auth);
+      setUser(null);
       navigation.navigate('Home');
     } catch (error) {
       console.error(error);
@@ -79,13 +81,12 @@ export default function UserProfile({ navigation }) {
     try {
       const response = await fetch(uri);
       const blob = await response.blob();
-      const correctedBlob = blob.slice(0, blob.size, 'image/jpeg'); 
-      console.log('Blob created:', correctedBlob);
+      console.log('Blob created:', blob);
       const storageRef = ref(storage, `profilePictures/${user.uid}`);
       const metadata = {
         contentType: 'image/jpeg', 
       };
-      await uploadBytes(storageRef, correctedBlob, metadata);
+      await uploadBytes(storageRef, blob, metadata);
       const url = await getDownloadURL(storageRef);
       console.log('Uploaded image URL:', url);
       setProfilePicture(url);
@@ -98,6 +99,8 @@ export default function UserProfile({ navigation }) {
 
   return (
     <View style={styles.container}>
+      {profilePicture && <Image source={{ uri: profilePicture }} style={styles.profilePicture} />}
+      <Button title="Change Profile Picture" onPress={pickImage} />
       <Text>Email: {email}</Text>
       <TextInput
         placeholder="New Email"
@@ -114,8 +117,6 @@ export default function UserProfile({ navigation }) {
         style={styles.input}
       />
       <Button title="Update Password" onPress={handleUpdatePassword} />
-      {profilePicture && <Image source={{ uri: profilePicture }} style={styles.profilePicture} />}
-      <Button title="Change Profile Picture" onPress={pickImage} />
       <Button title="Sign Out" onPress={handleSignOut} />
     </View>
   );

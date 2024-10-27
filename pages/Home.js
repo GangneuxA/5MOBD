@@ -13,7 +13,7 @@ export default function HomeScreen({ navigation }) {
   const handleSignUp = async () => {
     try {
       await createUserWithEmailAndPassword(firebase, signUpEmail, signUpPassword);
-      navigation.navigate('UserProfile');
+      navigation.navigate('Main');
     } catch (error) {
       alert(error.message);
     }
@@ -22,7 +22,7 @@ export default function HomeScreen({ navigation }) {
   const handleSignIn = async () => {
     try {
       await signInWithEmailAndPassword(firebase, signInEmail, signInPassword);
-      navigation.navigate('UserProfile');
+      navigation.navigate('Main');
     } catch (error) {
       alert(error.message);
     }

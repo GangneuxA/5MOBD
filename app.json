@@ -4,24 +4,16 @@
     "slug": "5MOBD",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
-    "splash": {
-      "image": "./assets/splash.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
-    },
+    "platforms": ["ios", "android"],
     "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show your position on the map."
       }
     },
-    "web": {
-      "favicon": "./assets/favicon.png"
+    "android": {
+      "permissions": ["ACCESS_FINE_LOCATION"],
+      "android.config.googleMaps.apiKey":"AIzaSyBlpm5jz6xtym3E88aT8hYPWvrqaNXIb2Y"
     }
   }
 }
