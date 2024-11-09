@@ -7,15 +7,23 @@ export default function AddressList({ navigation }) {
   const { addresses, publicAddresses, deleteAddress } = useContext(AddressContext);
   const { user } = useContext(UserContext);
 
-  const renderAddressItem = ({ item }) => (
+  const renderMyAddressItem = ({ item }) => (
     <TouchableOpacity onPress={() => navigation.navigate('AddressDetails', { address: item })}>
       <View style={styles.addressItem}>
         <Text style={styles.addressName}>{item.name}</Text>
         <Text>{item.description}</Text>
         {item.photo && <Image source={{ uri: item.photo }} style={styles.image} />}
-        {user && item.userId === user.uid && (
-          <Button title="Delete" onPress={() => deleteAddress(item.id)} />
-        )}
+        <Button title="Delete" onPress={() => deleteAddress(item.id)} />
+      </View>
+    </TouchableOpacity>
+  );
+
+  const renderPublicAddressItem = ({ item }) => (
+    <TouchableOpacity onPress={() => navigation.navigate('AddressDetails', { address: item })}>
+      <View style={styles.addressItem}>
+        <Text style={styles.addressName}>{item.name}</Text>
+        <Text>{item.description}</Text>
+        {item.photo && <Image source={{ uri: item.photo }} style={styles.image} />}
       </View>
     </TouchableOpacity>
   );
@@ -26,13 +34,13 @@ export default function AddressList({ navigation }) {
       <FlatList
         data={addresses}
         keyExtractor={(item) => item.id}
-        renderItem={renderAddressItem}
+        renderItem={renderMyAddressItem}
       />
       <Text style={styles.sectionTitle}>Public Addresses</Text>
       <FlatList
         data={publicAddresses}
         keyExtractor={(item) => item.id}
-        renderItem={renderAddressItem}
+        renderItem={renderPublicAddressItem}
       />
     </View>
   );

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
 import { firebase } from '../config/firebaseConfig';
+import { Ionicons } from '@expo/vector-icons'; // Importer les icônes d'Expo
 
 export default function HomeScreen({ navigation }) {
   const [signUpEmail, setSignUpEmail] = useState('');
@@ -30,6 +30,7 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Ionicons name="home" size={70} color="black" />
       <View style={styles.formContainer}>
         <TextInput
           placeholder="Email"
@@ -73,6 +74,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     padding: 16,
+  },
+  icon: {
+    position: 'absolute',
+    top: 50,
+    alignSelf: 'center',
   },
   formContainer: {
     flex: 1,

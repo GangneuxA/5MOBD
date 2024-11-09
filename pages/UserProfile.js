@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, TextInput, Button, Alert } from 'react-native';
 import { getAuth, updateEmail, updatePassword, signOut } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { ref, getDownloadURL, uploadBytes } from 'firebase/storage';
-import { db, storage } from '../config/firebaseConfig';
+import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
+import { storage } from '../config/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { UserContext } from '../context/UserContext';
 
@@ -17,25 +16,15 @@ export default function UserProfile({ navigation }) {
 
   useEffect(() => {
     if (user) {
-      fetchProfilePicture(user.uid);
+      const profilePicRef = ref(storage, `profilePictures/${user.uid}`);
+      getDownloadURL(profilePicRef)
+        .then((url) => setProfilePicture(url))
+        .catch(() => setProfilePicture(null));
     }
   }, [user]);
 
-  const fetchProfilePicture = async (uid) => {
-    try {
-      const userDoc = await getDoc(doc(db, 'users', uid));
-      if (userDoc.exists()) {
-        const profilePictureUrl = userDoc.data().profilePicture;
-        console.log('Fetched profile picture URL:', profilePictureUrl);
-        setProfilePicture(profilePictureUrl);
-      }
-    } catch (error) {
-      console.error('Error fetching profile picture:', error);
-    }
-  };
-
   const handleUpdateEmail = () => {
-    updateEmail(user, email)
+    updateEmail(auth.currentUser, email)
       .then(() => {
         console.log('Email mis à jour!');
       })
@@ -45,7 +34,7 @@ export default function UserProfile({ navigation }) {
   };
 
   const handleUpdatePassword = () => {
-    updatePassword(user, password)
+    updatePassword(auth.currentUser, password)
       .then(() => {
         console.log('Password mis à jour!');
       })
@@ -65,59 +54,90 @@ export default function UserProfile({ navigation }) {
   };
 
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
-
-    if (!result.cancelled) {
-      uploadImage(result.uri);
+    try {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission requise', 'Nous avons besoin d\'accéder à votre galerie pour choisir une image.');
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+      if (!result.cancelled) {
+        console.log('Uploading image...' + result.assets[0].uri);
+        uploadImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Error picking image: ', error);
+      Alert.alert('Erreur', 'Échec de la sélection de l\'image. Veuillez réessayer.');
     }
   };
 
   const uploadImage = async (uri) => {
     try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      console.log('Blob created:', blob);
-      const storageRef = ref(storage, `profilePictures/${user.uid}`);
-      const metadata = {
-        contentType: 'image/jpeg', 
-      };
-      await uploadBytes(storageRef, blob, metadata);
-      const url = await getDownloadURL(storageRef);
-      console.log('Uploaded image URL:', url);
-      setProfilePicture(url);
-      await setDoc(doc(db, 'users', user.uid), { profilePicture: url }, { merge: true });
-      console.log('Image uploaded and URL set:', url);
+      if (user) {
+        console.log('Uploading image...');
+        const reference = ref(storage, `profilePictures/${user.uid}`);
+        console.log('ref ok...');
+        const response = await fetch(uri);
+        console.log('res ok...');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const blob = await response.blob();
+        console.log('blob ok...');
+
+        const uploadTask = uploadBytesResumable(reference, blob);
+
+        uploadTask.on(
+          'state_changed',
+          (snapshot) => {
+            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+            console.log('Upload is ' + progress + '% done');
+          },
+          (error) => {
+            console.error('Error uploading image: ', error);
+            Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
+          },
+          async () => {
+            const url = await getDownloadURL(uploadTask.snapshot.ref);
+            console.log('url ok...');
+            setProfilePicture(url);
+            console.log('profil picture ok...');
+            Alert.alert('Succès', 'Votre photo de profil a été mise à jour!');
+          }
+        );
+      }
     } catch (error) {
-      console.error('Error uploading image:', error);
+      console.error('Error uploading image: ', error);
+      Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
 
   return (
     <View style={styles.container}>
       {profilePicture && <Image source={{ uri: profilePicture }} style={styles.profilePicture} />}
-      <Button title="Change Profile Picture" onPress={pickImage} />
+      <Button title="Changer la photo de profil" onPress={pickImage} />
       <Text>Email: {email}</Text>
       <TextInput
-        placeholder="New Email"
+        placeholder="Nouvel Email"
         value={email}
         onChangeText={setEmail}
         style={styles.input}
       />
-      <Button title="Update Email" onPress={handleUpdateEmail} />
+      <Button title="Mettre à jour l'Email" onPress={handleUpdateEmail} />
       <TextInput
-        placeholder="New Password"
+        placeholder="Nouveau Mot de Passe"
         value={password}
         onChangeText={setPassword}
         secureTextEntry
         style={styles.input}
       />
-      <Button title="Update Password" onPress={handleUpdatePassword} />
-      <Button title="Sign Out" onPress={handleSignOut} />
+      <Button title="Mettre à jour le Mot de Passe" onPress={handleUpdatePassword} />
+      <Button title="Déconnexion" onPress={handleSignOut} />
     </View>
   );
 }
