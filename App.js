@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons'; 
 import HomeScreen from './pages/Home';
 import UserProfile from './pages/UserProfile';
 import MapScreen from './pages/Map';
@@ -16,11 +17,34 @@ const Tab = createBottomTabNavigator();
 
 function MainTabs() {
   return (
-    <Tab.Navigator>
-      <Tab.Screen name="Map" component={MapScreen} />
-      <Tab.Screen name="UserProfile" component={UserProfile} />
-      <Tab.Screen name="Addresses" component={AddressList} />
-      <Tab.Screen name="AddAddress" component={AddAddress} />
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ color, size }) => {
+          let iconName;
+
+          if (route.name === 'Carte') {
+            iconName = 'map';
+            return <MaterialIcons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Profil') {
+            iconName = 'user';
+            return <FontAwesome name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Adresses') {
+            iconName = 'list';
+            return <Ionicons name={iconName} size={size} color={color} />;
+          } else if (route.name === 'Ajouter') {
+            iconName = 'add-circle';
+            return <Ionicons name={iconName} size={size} color={color} />;
+          }
+        },
+        tabBarActiveTintColor: 'tomato',
+        tabBarInactiveTintColor: 'gray',
+        tabBarStyle: { display: 'flex' },
+      })}
+    >
+      <Tab.Screen name="Carte" component={MapScreen} />
+      <Tab.Screen name="Profil" component={UserProfile} />
+      <Tab.Screen name="Adresses" component={AddressList} />
+      <Tab.Screen name="Ajouter" component={AddAddress} />
     </Tab.Navigator>
   );
 }

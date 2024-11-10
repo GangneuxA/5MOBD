@@ -16,7 +16,7 @@ export default function AddAddress({ navigation }) {
 
   const handleAddAddress = async () => {
     if (!user) {
-      console.error('User not logged in');
+      console.error('Utilisateur non connecté');
       return;
     }
 
@@ -26,20 +26,21 @@ export default function AddAddress({ navigation }) {
       isPublic,
       photo,
       userId: user.uid,
+      username: user.displayName, 
     };
     await addAddress(newAddress);
     setName('');
     setDescription('');
     setIsPublic(false);
     setPhoto(null);
-    navigation.navigate('Addresses'); // Rediriger vers la liste des adresses
+    navigation.navigate('Adresses'); 
   };
 
   const pickImage = async () => {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission required', 'We need access to your gallery to choose an image.');
+        Alert.alert('Permission requise', 'Nous avons besoin d\'accéder à votre galerie pour choisir une image.');
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -53,8 +54,8 @@ export default function AddAddress({ navigation }) {
         uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error picking image: ', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+      console.error('Erreur lors de la sélection de l\'image : ', error);
+      Alert.alert('Erreur', 'Échec de la sélection de l\'image. Veuillez réessayer.');
     }
   };
 
@@ -67,7 +68,7 @@ export default function AddAddress({ navigation }) {
         const response = await fetch(uri);
         console.log('res ok...');
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('La réponse réseau n\'était pas correcte');
         }
         const blob = await response.blob();
         console.log('blob ok...');
@@ -81,28 +82,28 @@ export default function AddAddress({ navigation }) {
             console.log('Upload is ' + progress + '% done');
           },
           (error) => {
-            console.error('Error uploading image: ', error);
-            Alert.alert('Error', 'Failed to upload image. Please try again.');
+            console.error('Erreur lors du téléchargement de l\'image : ', error);
+            Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
           },
           async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             console.log('url ok...');
             setPhoto(url);
             console.log('photo ok...');
-            Alert.alert('Success', 'Your address photo has been uploaded!');
+            Alert.alert('Succès', 'Votre photo d\'adresse a été téléchargée!');
           }
         );
       }
     } catch (error) {
-      console.error('Error uploading image: ', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
+      console.error('Erreur lors du téléchargement de l\'image : ', error);
+      Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
 
   return (
     <View style={styles.container}>
       <TextInput
-        placeholder="Name"
+        placeholder="Nom"
         value={name}
         onChangeText={setName}
         style={styles.input}
@@ -120,9 +121,11 @@ export default function AddAddress({ navigation }) {
           onValueChange={setIsPublic}
         />
       </View>
-      <Button title="Pick an image from camera roll" onPress={pickImage} />
+      <Button title="Choisir une image depuis la galerie" onPress={pickImage} />
       {photo && <Image source={{ uri: photo }} style={styles.image} />}
-      <Button title="Add Address" onPress={handleAddAddress} />
+      <View style={styles.buttonContainer}>
+        <Button title="Ajouter l'adresse" onPress={handleAddAddress} />
+      </View>
     </View>
   );
 }
@@ -148,5 +151,8 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     marginBottom: 12,
+  },
+  buttonContainer: {
+    marginTop: 12, 
   },
 });

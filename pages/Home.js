@@ -1,18 +1,22 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet } from 'react-native';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { View, TextInput, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { firebase } from '../config/firebaseConfig';
-import { Ionicons } from '@expo/vector-icons'; // Importer les icônes d'Expo
+import { Ionicons } from '@expo/vector-icons'; 
+import Entypo from '@expo/vector-icons/Entypo';
 
 export default function HomeScreen({ navigation }) {
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
+  const [signUpUsername, setSignUpUsername] = useState('');
   const [signInEmail, setSignInEmail] = useState('');
   const [signInPassword, setSignInPassword] = useState('');
 
   const handleSignUp = async () => {
     try {
-      await createUserWithEmailAndPassword(firebase, signUpEmail, signUpPassword);
+      const userCredential = await createUserWithEmailAndPassword(firebase, signUpEmail, signUpPassword);
+      const user = userCredential.user;
+      await updateProfile(user, { displayName: signUpUsername });
       navigation.navigate('Main');
     } catch (error) {
       alert(error.message);
@@ -30,8 +34,14 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Ionicons name="home" size={70} color="black" />
       <View style={styles.formContainer}>
+        <Text style={styles.formTitle}>Inscription</Text>
+        <TextInput
+          placeholder="Pseudo"
+          value={signUpUsername}
+          onChangeText={setSignUpUsername}
+          style={styles.input}
+        />
         <TextInput
           placeholder="Email"
           value={signUpEmail}
@@ -39,15 +49,18 @@ export default function HomeScreen({ navigation }) {
           style={styles.input}
         />
         <TextInput
-          placeholder="Password"
+          placeholder="Mot de passe"
           value={signUpPassword}
           onChangeText={setSignUpPassword}
           secureTextEntry
           style={styles.input}
         />
-        <Button title="Inscription" onPress={handleSignUp} />
+        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
+          <Ionicons name="person-add" size={24} color="white" />
+        </TouchableOpacity>
       </View>
       <View style={styles.formContainer}>
+        <Text style={styles.formTitle}>Connexion</Text>
         <TextInput
           placeholder="Email"
           value={signInEmail}
@@ -55,14 +68,17 @@ export default function HomeScreen({ navigation }) {
           style={styles.input}
         />
         <TextInput
-          placeholder="Password"
+          placeholder="Mot de passe"
           value={signInPassword}
           onChangeText={setSignInPassword}
           secureTextEntry
           style={styles.input}
         />
-        <Button title="Connexion" onPress={handleSignIn} />
+        <TouchableOpacity style={styles.button} onPress={handleSignIn}>
+          <Ionicons name="log-in" size={24} color="white" />
+        </TouchableOpacity>
       </View>
+      <Entypo name="address" size={150} color="black" style={styles.icon} />
     </View>
   );
 }
@@ -70,19 +86,22 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
+    justifyContent: 'center', 
+    alignItems: 'center', 
     padding: 16,
   },
   icon: {
-    position: 'absolute',
-    top: 50,
-    alignSelf: 'center',
+    marginTop: 20, 
   },
   formContainer: {
-    flex: 1,
-    margin: 10,
+    width: '80%', 
+    marginBottom: 20, 
+  },
+  formTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+    textAlign: 'center',
   },
   input: {
     height: 40,
@@ -90,5 +109,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
   },
 });

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, StyleSheet, Image, TextInput, Button, Alert } from 'react-native';
-import { getAuth, updateEmail, updatePassword, signOut } from 'firebase/auth';
+import { View, Text, StyleSheet, Image, TextInput, Button, Alert, TouchableOpacity } from 'react-native';
+import { getAuth, updateEmail, updatePassword, signOut, updateProfile } from 'firebase/auth';
 import { ref, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import { storage } from '../config/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
@@ -12,7 +12,9 @@ export default function UserProfile({ navigation }) {
 
   const [email, setEmail] = useState(user?.email || '');
   const [password, setPassword] = useState('');
+  const [username, setUsername] = useState(user?.displayName || '');
   const [profilePicture, setProfilePicture] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -23,24 +25,34 @@ export default function UserProfile({ navigation }) {
     }
   }, [user]);
 
-  const handleUpdateEmail = () => {
-    updateEmail(auth.currentUser, email)
-      .then(() => {
-        console.log('Email mis à jour!');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const handleUpdateEmail = async () => {
+    try {
+      await updateEmail(auth.currentUser, email);
+      console.log('Email mis à jour!');
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  const handleUpdatePassword = () => {
-    updatePassword(auth.currentUser, password)
-      .then(() => {
-        console.log('Password mis à jour!');
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+  const handleUpdatePassword = async () => {
+    try {
+      await updatePassword(auth.currentUser, password);
+      console.log('Mot de passe mis à jour!');
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handleUpdateUsername = async () => {
+    try {
+      await updateProfile(auth.currentUser, { displayName: username });
+      console.log('Pseudo mis à jour!');
+      setIsEditing(false);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const handleSignOut = async () => {
@@ -107,6 +119,7 @@ export default function UserProfile({ navigation }) {
             console.log('url ok...');
             setProfilePicture(url);
             console.log('profil picture ok...');
+            setIsEditing(false); 
             Alert.alert('Succès', 'Votre photo de profil a été mise à jour!');
           }
         );
@@ -120,24 +133,45 @@ export default function UserProfile({ navigation }) {
   return (
     <View style={styles.container}>
       {profilePicture && <Image source={{ uri: profilePicture }} style={styles.profilePicture} />}
-      <Button title="Changer la photo de profil" onPress={pickImage} />
-      <Text>Email: {email}</Text>
-      <TextInput
-        placeholder="Nouvel Email"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-      />
-      <Button title="Mettre à jour l'Email" onPress={handleUpdateEmail} />
-      <TextInput
-        placeholder="Nouveau Mot de Passe"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
-      <Button title="Mettre à jour le Mot de Passe" onPress={handleUpdatePassword} />
-      <Button title="Déconnexion" onPress={handleSignOut} />
+      {isEditing && <Button title="Changer la photo de profil" onPress={pickImage} />}
+      {!isEditing && (
+        <>
+          <Text style={styles.infoText}>Pseudo : {username}</Text>
+          <Text style={styles.infoText}>Email : {email}</Text>
+        </>
+      )}
+      {isEditing && (
+        <>
+          <TextInput
+            placeholder="Nouveau Pseudo"
+            value={username}
+            onChangeText={setUsername}
+            style={styles.input}
+          />
+          <Button title="Mettre à jour le Pseudo" onPress={handleUpdateUsername} />
+          <TextInput
+            placeholder="Nouvel Email"
+            value={email}
+            onChangeText={setEmail}
+            style={styles.input}
+          />
+          <Button title="Mettre à jour l'Email" onPress={handleUpdateEmail} />
+          <TextInput
+            placeholder="Nouveau Mot de Passe"
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry
+            style={styles.input}
+          />
+          <Button title="Mettre à jour le Mot de Passe" onPress={handleUpdatePassword} />
+        </>
+      )}
+      <TouchableOpacity style={styles.button} onPress={() => setIsEditing(!isEditing)}>
+        <Text style={styles.buttonText}>{isEditing ? 'Annuler' : 'Modifier le Profil'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={[styles.button, styles.signOutButton]} onPress={handleSignOut}>
+        <Text style={styles.buttonText}>Déconnexion</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -150,10 +184,14 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   profilePicture: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+    width: 150,
+    height: 150,
+    borderRadius: 75,
     marginBottom: 20,
+  },
+  infoText: {
+    fontSize: 18,
+    marginBottom: 10,
   },
   input: {
     height: 40,
@@ -162,5 +200,19 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingHorizontal: 8,
     width: '80%',
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    padding: 10,
+    alignItems: 'center',
+    borderRadius: 5,
+    marginTop: 20,
+  },
+  signOutButton: {
+    marginTop: 10, 
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
   },
 });

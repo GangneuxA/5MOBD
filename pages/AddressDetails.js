@@ -19,7 +19,7 @@ export default function AddressDetails({ route }) {
 
   const handleAddComment = async () => {
     if (!user) {
-      console.error('User not logged in');
+      console.error('Utilisateur non connecté');
       return;
     }
 
@@ -29,6 +29,7 @@ export default function AddressDetails({ route }) {
       text: commentText,
       photo: commentPhoto,
       createdAt: new Date(),
+      username: user.displayName, 
     };
     await addComment(newComment);
     setCommentText('');
@@ -39,7 +40,7 @@ export default function AddressDetails({ route }) {
     try {
       const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (status !== 'granted') {
-        Alert.alert('Permission required', 'We need access to your gallery to choose an image.');
+        Alert.alert('Permission requise', 'Nous avons besoin d\'accéder à votre galerie pour choisir une image.');
         return;
       }
       const result = await ImagePicker.launchImageLibraryAsync({
@@ -53,8 +54,8 @@ export default function AddressDetails({ route }) {
         uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error picking image: ', error);
-      Alert.alert('Error', 'Failed to pick image. Please try again.');
+      console.error('Erreur lors de la sélection de l\'image : ', error);
+      Alert.alert('Erreur', 'Échec de la sélection de l\'image. Veuillez réessayer.');
     }
   };
 
@@ -67,7 +68,7 @@ export default function AddressDetails({ route }) {
         const response = await fetch(uri);
         console.log('res ok...');
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('La réponse réseau n\'était pas correcte');
         }
         const blob = await response.blob();
         console.log('blob ok...');
@@ -81,21 +82,21 @@ export default function AddressDetails({ route }) {
             console.log('Upload is ' + progress + '% done');
           },
           (error) => {
-            console.error('Error uploading image: ', error);
-            Alert.alert('Error', 'Failed to upload image. Please try again.');
+            console.error('Erreur lors du téléchargement de l\'image : ', error);
+            Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
           },
           async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             console.log('url ok...');
             setCommentPhoto(url);
-            console.log('comment photo ok...');
-            Alert.alert('Success', 'Your comment photo has been uploaded!');
+            console.log('photo de commentaire ok...');
+            Alert.alert('Succès', 'Votre photo de commentaire a été téléchargée!');
           }
         );
       }
     } catch (error) {
-      console.error('Error uploading image: ', error);
-      Alert.alert('Error', 'Failed to upload image. Please try again.');
+      console.error('Erreur lors du téléchargement de l\'image : ', error);
+      Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
 
@@ -109,7 +110,7 @@ export default function AddressDetails({ route }) {
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <View style={styles.commentItem}>
-            <Text>{item.text}</Text>
+            <Text>{item.username} : {item.text}</Text>
             {item.photo && <Image source={{ uri: item.photo }} style={styles.commentImage} />}
           </View>
         )}
@@ -117,14 +118,18 @@ export default function AddressDetails({ route }) {
       {user.uid !== address.userId && (
         <View style={styles.commentForm}>
           <TextInput
-            placeholder="Add a comment"
+            placeholder="Ajouter un commentaire"
             value={commentText}
             onChangeText={setCommentText}
             style={styles.input}
           />
-          <Button title="Pick an image" onPress={pickImage} />
+          <View style={styles.buttonContainer}>
+            <Button title="Choisir une image" onPress={pickImage} />
+          </View>
           {commentPhoto && <Image source={{ uri: commentPhoto }} style={styles.commentImage} />}
-          <Button title="Add Comment" onPress={handleAddComment} />
+          <View style={styles.buttonContainer}>
+            <Button title="Ajouter un commentaire" onPress={handleAddComment} />
+          </View>
         </View>
       )}
     </View>
@@ -165,5 +170,8 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginBottom: 12,
     paddingHorizontal: 8,
+  },
+  buttonContainer: {
+    marginTop: 12, 
   },
 });
