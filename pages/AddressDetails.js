@@ -103,6 +103,7 @@ export default function AddressDetails({ route }) {
   return (
     <View style={styles.container}>
       <Text style={styles.addressName}>{address.name}</Text>
+      <Text>Où : {address.address}</Text>
       <Text>{address.description}</Text>
       {address.photo && <Image source={{ uri: address.photo }} style={styles.image} />}
       <FlatList

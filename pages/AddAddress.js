@@ -11,6 +11,7 @@ export default function AddAddress({ navigation }) {
   const { user } = useContext(UserContext);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [address, setAddress] = useState('');
   const [isPublic, setIsPublic] = useState(false);
   const [photo, setPhoto] = useState(null);
 
@@ -23,6 +24,7 @@ export default function AddAddress({ navigation }) {
     const newAddress = {
       name,
       description,
+      address,
       isPublic,
       photo,
       userId: user.uid,
@@ -31,6 +33,7 @@ export default function AddAddress({ navigation }) {
     await addAddress(newAddress);
     setName('');
     setDescription('');
+    setAddress('');
     setIsPublic(false);
     setPhoto(null);
     navigation.navigate('Adresses');
@@ -113,6 +116,13 @@ export default function AddAddress({ navigation }) {
         placeholder="Description"
         value={description}
         onChangeText={setDescription}
+        style={styles.input}
+        placeholderTextColor="black"
+      />
+      <TextInput
+        placeholder="Adresse"
+        value={address}
+        onChangeText={setAddress}
         style={styles.input}
         placeholderTextColor="black"
       />
