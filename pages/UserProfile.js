@@ -83,7 +83,7 @@ export default function UserProfile({ navigation }) {
         uploadImage(result.assets[0].uri);
       }
     } catch (error) {
-      console.error('Error picking image: ', error);
+      console.error('Erreur lors de la sélection de l\'image : ', error);
       Alert.alert('Erreur', 'Échec de la sélection de l\'image. Veuillez réessayer.');
     }
   };
@@ -97,7 +97,7 @@ export default function UserProfile({ navigation }) {
         const response = await fetch(uri);
         console.log('res ok...');
         if (!response.ok) {
-          throw new Error('Network response was not ok');
+          throw new Error('La réponse réseau n\'était pas correcte');
         }
         const blob = await response.blob();
         console.log('blob ok...');
@@ -111,21 +111,21 @@ export default function UserProfile({ navigation }) {
             console.log('Upload is ' + progress + '% done');
           },
           (error) => {
-            console.error('Error uploading image: ', error);
+            console.error('Erreur lors du téléchargement de l\'image : ', error);
             Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
           },
           async () => {
             const url = await getDownloadURL(uploadTask.snapshot.ref);
             console.log('url ok...');
             setProfilePicture(url);
-            console.log('profil picture ok...');
+            console.log('photo de profil ok...');
             setIsEditing(false); 
             Alert.alert('Succès', 'Votre photo de profil a été mise à jour!');
           }
         );
       }
     } catch (error) {
-      console.error('Error uploading image: ', error);
+      console.error('Erreur lors du téléchargement de l\'image : ', error);
       Alert.alert('Erreur', 'Échec du téléchargement de l\'image. Veuillez réessayer.');
     }
   };
@@ -147,6 +147,7 @@ export default function UserProfile({ navigation }) {
             value={username}
             onChangeText={setUsername}
             style={styles.input}
+            placeholderTextColor="black"
           />
           <Button title="Mettre à jour le Pseudo" onPress={handleUpdateUsername} />
           <TextInput
@@ -154,6 +155,7 @@ export default function UserProfile({ navigation }) {
             value={email}
             onChangeText={setEmail}
             style={styles.input}
+            placeholderTextColor="black"
           />
           <Button title="Mettre à jour l'Email" onPress={handleUpdateEmail} />
           <TextInput
@@ -162,6 +164,7 @@ export default function UserProfile({ navigation }) {
             onChangeText={setPassword}
             secureTextEntry
             style={styles.input}
+            placeholderTextColor="black"
           />
           <Button title="Mettre à jour le Mot de Passe" onPress={handleUpdatePassword} />
         </>

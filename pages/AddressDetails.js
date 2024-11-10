@@ -29,7 +29,7 @@ export default function AddressDetails({ route }) {
       text: commentText,
       photo: commentPhoto,
       createdAt: new Date(),
-      username: user.displayName, 
+      username: user.displayName,
     };
     await addComment(newComment);
     setCommentText('');
@@ -122,6 +122,7 @@ export default function AddressDetails({ route }) {
             value={commentText}
             onChangeText={setCommentText}
             style={styles.input}
+            placeholderTextColor="black"
           />
           <View style={styles.buttonContainer}>
             <Button title="Choisir une image" onPress={pickImage} />
@@ -172,6 +173,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   buttonContainer: {
-    marginTop: 12, 
+    marginTop: 12,
   },
 });

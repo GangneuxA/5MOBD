@@ -26,14 +26,14 @@ export default function AddAddress({ navigation }) {
       isPublic,
       photo,
       userId: user.uid,
-      username: user.displayName, 
+      username: user.displayName,
     };
     await addAddress(newAddress);
     setName('');
     setDescription('');
     setIsPublic(false);
     setPhoto(null);
-    navigation.navigate('Adresses'); 
+    navigation.navigate('Adresses');
   };
 
   const pickImage = async () => {
@@ -107,12 +107,14 @@ export default function AddAddress({ navigation }) {
         value={name}
         onChangeText={setName}
         style={styles.input}
+        placeholderTextColor="black"
       />
       <TextInput
         placeholder="Description"
         value={description}
         onChangeText={setDescription}
         style={styles.input}
+        placeholderTextColor="black"
       />
       <View style={styles.switchContainer}>
         <Text>Public</Text>
@@ -153,6 +155,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   buttonContainer: {
-    marginTop: 12, 
+    marginTop: 12,
   },
 });

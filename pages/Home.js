@@ -41,12 +41,14 @@ export default function HomeScreen({ navigation }) {
           value={signUpUsername}
           onChangeText={setSignUpUsername}
           style={styles.input}
+          placeholderTextColor="black"
         />
         <TextInput
           placeholder="Email"
           value={signUpEmail}
           onChangeText={setSignUpEmail}
           style={styles.input}
+          placeholderTextColor="black"
         />
         <TextInput
           placeholder="Mot de passe"
@@ -54,6 +56,7 @@ export default function HomeScreen({ navigation }) {
           onChangeText={setSignUpPassword}
           secureTextEntry
           style={styles.input}
+          placeholderTextColor="black"
         />
         <TouchableOpacity style={styles.button} onPress={handleSignUp}>
           <Ionicons name="person-add" size={24} color="white" />
@@ -66,6 +69,7 @@ export default function HomeScreen({ navigation }) {
           value={signInEmail}
           onChangeText={setSignInEmail}
           style={styles.input}
+          placeholderTextColor="black"
         />
         <TextInput
           placeholder="Mot de passe"
@@ -73,6 +77,7 @@ export default function HomeScreen({ navigation }) {
           onChangeText={setSignInPassword}
           secureTextEntry
           style={styles.input}
+          placeholderTextColor="black"
         />
         <TouchableOpacity style={styles.button} onPress={handleSignIn}>
           <Ionicons name="log-in" size={24} color="white" />
