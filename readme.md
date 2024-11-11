@@ -1,4 +1,4 @@
-# Projet 5MOBD - Application Mobile de Partage d'Adresses
+# Projet 5MOBD - Mes Bonnes Addresses
 
 ## Table des Matières
 1. [Auteurs](#auteurs)
@@ -68,3 +68,6 @@ Alexis Gangneux
 - Activer firestorage
 - Activer firestore database
 
+## Tests
+Les tests unitaires, fonctionnels, end-to-end (e2e) et les Storybook sont disponibles sur une autre branche Git : `test`. 
+Malheureusement, ces tests ne sont pas fonctionnels pour le moment.
