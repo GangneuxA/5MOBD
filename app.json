@@ -7,7 +7,7 @@
     "platforms": ["ios", "android"],
     "ios": {
       "supportsTablet": true,
-      "ios.config.googleMapsApiKey":"",
+      "ios.config.googleMapsApiKey":"AIzaSyCJRVWLfOfDaVeaKaZCIuYv7uVedqdlt3Q",
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "This app uses your location to show your position on the map.",
         "NSCameraUsageDescription": "This app needs access to your camera to take photos.",
@@ -16,7 +16,7 @@
     },
     "android": {
       "permissions": ["ACCESS_FINE_LOCATION"],
-      "android.config.googleMaps.apiKey":""
+      "android.config.googleMaps.apiKey":"AIzaSyCJRVWLfOfDaVeaKaZCIuYv7uVedqdlt3Q"
     }
   }
 }
